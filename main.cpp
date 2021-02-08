@@ -50,6 +50,14 @@ vector<vector<State>> ReadBoardFile(string file)
 	return board;
 }
 
+// Search function stub
+vector<vector<State>> Search(vector<vector<State>> grid, int initial_point[2], int goal_point[2])
+{
+	cout << "No path found!\n";
+	vector<vector<State>> solution{};
+	return solution;
+}
+
 string CellString(State cell)
 {
 	switch(cell)
@@ -75,8 +83,15 @@ void PrintBoard(const vector<vector<State>> board)
 
 int main()
 {
+	// Test the solution stub
+	int initial_point[2] {0,0};
+	int goal_point[2] {4,5};
+
 	string file_path = "files/1.board.txt"; 	
 	vector<vector<State>> board;
 	board = ReadBoardFile(file_path);			   
-	PrintBoard(board);
+	
+	auto solution = Search(board, initial_point, goal_point);
+
+	PrintBoard(solution);
 }
