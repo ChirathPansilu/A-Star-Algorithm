@@ -56,6 +56,11 @@ int Heuristic(int x1, int y1, int x2, int y2)
 	return abs(x1-x2) + abs(y1-y2);
 }
 
+bool Compare(vector<int> &node1, vector<int> &node2)
+{
+	return (node1[2]+node1[3] > node2[2]+node2[3]);
+}
+
 void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vector<vector<State>> &grid )
 {
 	vector<int> node{x,y,g,h};
@@ -122,4 +127,5 @@ int main()
 	//Tests
 	TestHeuristic();
 	TestAddToOpen();
+	TestCompare();
 }
