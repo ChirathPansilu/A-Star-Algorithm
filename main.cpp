@@ -9,7 +9,7 @@ using std::ifstream;
 using std::string;
 using std::istringstream;
 
-enum class State { kEmpty, kObstacle };
+enum class State { kEmpty, kObstacle, kClosed };
 
 vector<State> ParseLine(string line)
 {
@@ -46,6 +46,8 @@ vector<vector<State>> ReadBoardFile(string file)
 
 	}
 	myFile.close();
+
+	cout<< "board.size() or i:"<<board.size()<<", board[0].size() or j:"<<board[0].size() << "\n";
 	
 	return board;
 }
@@ -54,6 +56,13 @@ vector<vector<State>> ReadBoardFile(string file)
 int Heuristic(int x1, int y1, int x2, int y2)
 {
 	return abs(x1-x2) + abs(y1-y2);
+}
+
+void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vector<vector<State>> &grid )
+{
+	vector<int> node{x,y,g,h};
+	open_nodes.push_back(node);
+	grid[x][y] = State::kClosed;  //x is measured vertically and y horizontally
 }
 
 // Search function stub
@@ -68,10 +77,9 @@ string CellString(State cell)
 {
 	switch(cell)
 	{
-		case State::kObstacle:
-			return "⛰️   ";
-		default: // When State::kEmpty
-			return "0   ";
+		case State::kObstacle:	return "⛰️   ";
+		case State::kClosed: return "x   ";
+		default: return "0   ";
 	}
 }
 
@@ -87,26 +95,7 @@ void PrintBoard(const vector<vector<State>> board)
 	}
 }
 
-// Test for heuristic
-void TestHeuristic() {
-	cout << "----------------------------------------------------------" << "\n";
-	cout << "Heuristic Function Test: ";
-	if (Heuristic(1, 2, 3, 4) != 4) {
-		cout << "failed" << "\n";
-		cout << "\n" << "Heuristic(1, 2, 3, 4) = " << Heuristic(1, 2, 3, 4) << "\n";
-		cout << "Correct result: 4" << "\n";
-		cout << "\n";
-	} else if (Heuristic(2, -1, 4, -7) != 8) {
-		cout << "TestHeuristic Failed" << "\n";
-		cout << "\n" << "Heuristic(2, -1, 4, -7) = " << Heuristic(2, -1, 4, -7) << "\n";
-		cout << "Correct result: 8" << "\n";
-		cout << "\n";
-	} else {
-		cout << "passed" << "\n";
-	}
-	cout << "----------------------------------------------------------" << "\n";
-}
-
+#include "tests.h"
 
 int main()
 {
@@ -115,13 +104,12 @@ int main()
 	int goal_point[2] {4,5};
 
 	string file_path = "files/1.board.txt"; 	
-	vector<vector<State>> board;
-	board = ReadBoardFile(file_path);			   
+	vector<vector<State>> board = ReadBoardFile(file_path);
 	
 	auto solution = Search(board, initial_point, goal_point);
-
 	PrintBoard(solution);
 
 	//Tests
 	TestHeuristic();
+	TestAddToOpen();
 }
