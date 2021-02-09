@@ -74,13 +74,6 @@ void TestAddToOpen() {
     cout << "\n";
   } else {
     cout << "passed" << "\n";
-    cout << "\n";
-    cout << "Your grid is: " << "\n";
-    PrintVectorOfVectors(grid);
-    cout << "\n";
-    cout << "Solution grid is: " << "\n";
-    PrintVectorOfVectors(solution_grid);
-    cout << "\n";
   }
   cout << "----------------------------------------------------------" << "\n";
   return;

@@ -46,8 +46,6 @@ vector<vector<State>> ReadBoardFile(string file)
 
 	}
 	myFile.close();
-
-	cout<< "board.size() or i:"<<board.size()<<", board[0].size() or j:"<<board[0].size() << "\n";
 	
 	return board;
 }
@@ -66,8 +64,20 @@ void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vec
 }
 
 // Search function stub
-vector<vector<State>> Search(vector<vector<State>> grid, int initial_point[2], int goal_point[2])
-{
+vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2])
+{	
+	//create vector of open nodes
+	vector<vector<int>> open{};
+
+	//initialize the starting node
+	int x = init[0];
+	int y = init[1];
+	int g = 0;
+	int h = Heuristic(x,y,goal[0],goal[1]);
+
+	//add first node to openlist
+	AddToOpen(x,y,g,h,open,grid);
+
 	cout << "No path found!\n";
 	vector<vector<State>> solution{};
 	return solution;
