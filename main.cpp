@@ -1,3 +1,6 @@
+#include <algorithm>
+using std::sort;
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,7 +12,7 @@ using std::ifstream;
 using std::string;
 using std::istringstream;
 
-enum class State { kEmpty, kObstacle, kClosed };
+enum class State { kEmpty, kObstacle, kClosed, kPath };
 
 vector<State> ParseLine(string line)
 {
@@ -50,15 +53,22 @@ vector<vector<State>> ReadBoardFile(string file)
 	return board;
 }
 
+bool Compare(const vector<int> node1, const vector<int> node2)
+{
+	return (node1[2]+node1[3] > node2[2]+node2[3]);
+}
+
+/**
+ * Sort the two-dimensional vector of ints in descending order.
+ */
+void CellSort(vector<vector<int>> *v) {
+  sort(v->begin(), v->end(), Compare);
+}
+
 // Heuristic function - calculates the manhattan distance
 int Heuristic(int x1, int y1, int x2, int y2)
 {
 	return abs(x1-x2) + abs(y1-y2);
-}
-
-bool Compare(vector<int> &node1, vector<int> &node2)
-{
-	return (node1[2]+node1[3] > node2[2]+node2[3]);
 }
 
 void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vector<vector<State>> &grid )
@@ -79,10 +89,45 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 	int y = init[1];
 	int g = 0;
 	int h = Heuristic(x,y,goal[0],goal[1]);
-
-	//add first node to openlist
 	AddToOpen(x,y,g,h,open,grid);
 
+	/*
+  	// TODO: while open vector is non empty {
+    // TODO: Sort the open list using CellSort, and get the current node.
+
+    // TODO: Get the x and y values from the current node,
+    // and set grid[x][y] to kPath.
+
+    // TODO: Check if you've reached the goal. If so, return grid.
+
+
+    // If we're not done, expand search to current node's neighbors. This step will be completed in a later quiz.
+    // ExpandNeighbors
+
+  	//} // TODO: End while loop
+  	*/
+
+  	while( ! open.empty() )
+  	{
+  		//Sort the openlist
+  		CellSort(&open);
+  		//get the node with the least f-value
+  		vector<int> currentNode = open.back();
+  		open.pop_back();
+
+  		int currentNodeX = currentNode[0];
+  		int currentNodeY = currentNode[1];
+
+  		grid[currentNodeX][currentNodeY] = State::kPath;
+
+  		if(currentNodeX == goal[0] && currentNodeY == goal[1])
+  		{
+  			return grid;
+  		}
+
+  	}
+
+	//We've run out of new nodes to explore and haven't found a path
 	cout << "No path found!\n";
 	vector<vector<State>> solution{};
 	return solution;
@@ -94,6 +139,7 @@ string CellString(State cell)
 	{
 		case State::kObstacle:	return "⛰️   ";
 		case State::kClosed: return "x   ";
+		case State::kPath: return "⛰️   ";
 		default: return "0   ";
 	}
 }
@@ -128,4 +174,5 @@ int main()
 	TestHeuristic();
 	TestAddToOpen();
 	TestCompare();
+	TestSearch();
 }
