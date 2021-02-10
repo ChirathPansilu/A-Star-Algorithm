@@ -1,82 +1,88 @@
+/* Constants
+
+This example highlights how to use const to promise not to modify a variable, 
+even though the variable can only be evaluated at run time.
+
+The example also show how to use constexpr to guarantee that a variable can be evaluated at compile time.
+*/
+
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <vector>
-#include <string>
-using std::cout;
-using std::vector;
-using std::ifstream;
-using std::string;
-using std::istringstream;
 
-enum class State { kEmpty, kObstacle };
 
-vector<State> ParseLine(string line)
-{
-	vector<State> line_v;
-	istringstream myStream(line);
-	int n;
-	char c;
-	while(myStream >> n >> c)
-	{
-		switch(n){
-			case 0:
-				line_v.push_back(State::kEmpty);
-			case 1:
-				line_v.push_back(State::kObstacle);
-		}
-	}
-	return line_v;
+//j can cowork with a non-const i, but k can't
+void example1(){
+    int i;
+    std::cout << "Enter an integer value for i: ";
+    std::cin >> i;
+    const int j = i * 2;  // "j can only be evaluated at run time."
+                          // "But I promise not to change it after it is initialized."
+
+    constexpr int k = 3;  // "k, in contrast, can be evaluated at compile time."
+
+    std::cout << "j = " << j << "\n";
+    std::cout << "k = " << k << "\n";
 }
 
-vector<vector<State>> ReadBoardFile(string file)
-{
-	ifstream myFile(file);
-	vector<vector<State>> board;
-	if(myFile)
-	{
-		string line;
-		while(getline(myFile, line))
-		{
-			board.push_back(ParseLine(line));
-		}
 
-	}else
-	{
-		cout << "no such file\n";
-	}
-	myFile.close();
-	
-	return board;
+void example2(){
+    const int i = 2; // "I promise not to change this."
+    i++;             // "I just broke my promise."
+
+    //will get error
+    //main.cpp: In function ‘void example2()’:
+    //main.cpp:41:6: error: increment of read-only variable ‘i’
+    //     i++;             // "I just broke my promise."
 }
 
-string CellString(State cell)
-{
-	switch(cell)
-	{
-		case State::kObstacle:
-			return "🏔 ";
-		default:
-			return "0 ";
-	}
+void example3(){
+
+    constexpr int i = 2;  // "i can be evaluated at compile time."
+    i++;                  // "But changing a constexpr variable triggers an error."
+
+
+    //main.cpp: In function ‘void example3()’:
+    //main.cpp:53:6: error: increment of read-only variable ‘i’
+    //     i++;                  // "But changing a constexpr variable triggers an error."
+
 }
 
-void PrintBoard(vector<vector<State>> board)
-{
-	for(auto i:board)
-	{
-		for(auto j: i)
-		{
-			cout << CellString(j) << ' ' ;
-		}
-		cout << '\n';
-	}
+
+void example4(){
+    //The compiler will catch a constexpr variable that cannot be evaluated at compile time.
+    int i;
+    std::cout << "Enter an integer value for i: ";
+    std::cin >> i;
+    constexpr int j = i * 2;  // "j can only be evaluated at run time, because i will get the value in run time."
+                              // "constexpr must be evaluated at compile time."
+                              // "So this code will produce a compilation error."
+
 }
+
+
+/*
+A common usage of const is to guard against accidentally changing a variable,
+especially when it is passed-by-reference as a function argument.
+*/
+
+int sum(const std::vector<int> &v)                //  https://www.geeksforgeeks.org/when-do-we-pass-arguments-by-reference-or-pointer/
+{                                                 // https://medium.com/@vgasparyan1995/pass-by-value-vs-pass-by-reference-to-const-c-f8944171e3ce
+    int sum = 0;
+    for(int i : v)
+        sum += i;
+    return sum;
+}
+
+/*
+The major difference between const and constexpr, is that constexpr must be evaluated at compile time.
+*/
 
 int main()
 {
-	// string file_path = "files/1.board.txt"; 	
-	// vector<vector<State>> board;
-	// board = ReadBoardFile(file_path);			   
-	// PrintBoard(board);
+    example1();
+    //example2();
+    //example3();
+    //example4();
+    std::vector<int> v {0, 1, 2, 3, 4};
+    std::cout << sum(v) << "\n";
 }
