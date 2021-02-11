@@ -52,37 +52,36 @@ vector<vector<State>> ReadBoardFile(string file)
 	return board;
 }
 
+// Compare the F values of two cells.
 bool Compare(const vector<int> node1, const vector<int> node2)
 {
 	return (node1[2]+node1[3] > node2[2]+node2[3]);
 }
 
-/**
- * Sort the two-dimensional vector of ints in descending order.
- */
+//Sort the two-dimensional vector of ints in descending order.
 void CellSort(vector<vector<int>> *v) {
   sort(v->begin(), v->end(), Compare);
 }
 
-// Heuristic function - calculates the manhattan distance
+// Calculate the Manhattan Distance
 int Heuristic(int x1, int y1, int x2, int y2)
 {
 	return abs(x1-x2) + abs(y1-y2);
 }
 
-bool CheckValidCell(int x, int y, vector<vector<State>> &grid)
+// Check that a cell is valid: on the grid and not an obstacle and clear.
+bool CheckValidCell(int x, int y,const vector<vector<State>> &grid)
 {
 	int gridX = grid.size();
 	int gridY = grid[0].size();
 
 	if ( 0<= x && x<gridX && 0<= y && y<gridY )
-	{
 		return ( grid[x][y] == State::kEmpty );
-	
-	}
-	return false;
+	else
+		return false;
 }
 
+// Add a node to open_nodes and mark grid cell as closed
 void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vector<vector<State>> &grid )
 {
 	vector<int> node{x,y,g,h};
@@ -90,10 +89,38 @@ void AddToOpen( int x, int y, int g, int h, vector<vector<int>> &open_nodes, vec
 	grid[x][y] = State::kClosed;  //x is measured vertically and y horizontally
 }
 
-// Search function stub
+// Expand current node's neighbors and add them to open_nodes.
+void ExpandNeighbors(const vector<int> &currentNode,
+					const int goal[2], 
+					vector<vector<int>> &open_nodes,
+					vector<vector<State>> &grid)
+{
+	int currentNodeX = currentNode[0];
+	int currentNodeY = currentNode[1];
+	int currentNodeG = currentNode[2];
+
+	// directional deltas
+	const int delta[4][2] { {-1, 0}, {0, -1}, {1, 0}, {0, 1} };
+
+	// loop through potential neighbors
+	for(auto dir: delta)
+	{
+		int potX = currentNodeX + dir[0];
+		int potY = currentNodeY + dir[1];
+
+		if ( CheckValidCell(potX, potY, grid) ) 
+		{
+			int potG = currentNodeG + 1 ;
+			int potH = Heuristic(potX, potY, goal[0], goal[1]);
+			AddToOpen(potX, potY, potG, potH, open_nodes, grid);
+		}
+	}
+}
+
+// Implementation of A* search algorithm
 vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2])
 {	
-	//create vector of open nodes
+	//create vector of open_nodes
 	vector<vector<int>> open{};
 
 	//initialize the starting node
@@ -105,7 +132,7 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 
   	while( ! open.empty() )
   	{
-  		//Sort the openlist
+  		//Sort the open_nodes
   		CellSort(&open);
   		//get the node with the least f-value
   		vector<int> currentNode = open.back();
@@ -114,9 +141,13 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
   		int currentNodeY = currentNode[1];
   		grid[currentNodeX][currentNodeY] = State::kPath;
 
+  		// Check for Goal
   		if(currentNodeX == goal[0] && currentNodeY == goal[1]){
   			return grid;
   		}
+
+  		// Expand search to current node's neighbors
+  		ExpandNeighbors(currentNode, goal, open, grid);
 
   	}
 
@@ -131,12 +162,13 @@ string CellString(State cell)
 	{
 		case State::kObstacle:	return "⛰️   ";
 		case State::kPath: return "🚗   ";
-		//case State::kClosed: return "x   ";
-		default: return "0   ";
+		case State::kClosed: return "C   ";
+		case State::kEmpty: return "0   ";
+		default: return "?   ";
 	}
 }
 
-void PrintBoard(const vector<vector<State>> board)
+void PrintBoard(const vector<vector<State>> &board)
 {
 	for(auto i:board)
 	{
@@ -152,7 +184,6 @@ void PrintBoard(const vector<vector<State>> board)
 
 int main()
 {
-	// Test the solution stub
 	int initial_point[2] {0,0};
 	int goal_point[2] {4,5};
 
@@ -168,4 +199,5 @@ int main()
 	TestCompare();
 	TestSearch();
 	TestCheckValidCell();
+	TestExpandNeighbors();
 }
