@@ -114,27 +114,29 @@ void TestCompare() {
   } else {
     cout << "passed" << "\n";
   }
+  return;
 }
 
 void TestSearch() {
   cout << "----------------------------------------------------------" << "\n";
-  cout << "Search Function Test (Partial): ";
+  cout << "Search Function Test: ";
+  int init[2]{0, 0};
   int goal[2]{4, 5};
   auto board = ReadBoardFile("files/1.board.txt");
 
   std::cout.setstate(std::ios_base::failbit); // Disable cout
-  auto output = Search(board, goal, goal);
+  auto output = Search(board, init, goal);
   std::cout.clear(); // Enable cout
 
-  vector<vector<State>> solution{{State::kEmpty, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
-                            {State::kEmpty, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
-                            {State::kEmpty, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
-                            {State::kEmpty, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
-                            {State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty, State::kObstacle, State::kPath}};
+  vector<vector<State>> solution{{State::kStart, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
+                            {State::kPath, State::kObstacle, State::kEmpty, State::kEmpty, State::kEmpty, State::kEmpty},
+                            {State::kPath, State::kObstacle, State::kEmpty, State::kClosed, State::kClosed, State::kClosed},
+                            {State::kPath, State::kObstacle, State::kClosed, State::kPath, State::kPath, State::kPath},
+                            {State::kPath, State::kPath, State::kPath, State::kPath, State::kObstacle, State::kFinish}};
 
   if (output != solution) {
     cout << "failed" << "\n";
-    cout << "Search(board, {4,5}, {4,5})" << "\n";
+    cout << "Search(board, {0,0}, {4,5})" << "\n";
     cout << "Solution board: " << "\n";
     PrintVectorOfVectors(solution);
     cout << "Your board: " << "\n";
@@ -143,6 +145,7 @@ void TestSearch() {
   } else {
     cout << "passed" << "\n";
   }
+  return;
 }
 
 void TestCheckValidCell() {

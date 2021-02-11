@@ -11,7 +11,7 @@ using std::string;
 using std::istringstream;
 using std::sort;
 
-enum class State { kEmpty, kObstacle, kClosed, kPath };
+enum class State { kEmpty, kObstacle, kClosed, kPath, kStart, kFinish };
 
 vector<State> ParseLine(string line)
 {
@@ -143,6 +143,8 @@ vector<vector<State>> Search(vector<vector<State>> grid, int init[2], int goal[2
 
   		// Check for Goal
   		if(currentNodeX == goal[0] && currentNodeY == goal[1]){
+  			grid[init[0]][init[1]] = State::kStart;
+  			grid[goal[0]][goal[1]] = State::kFinish;
   			return grid;
   		}
 
@@ -163,6 +165,8 @@ string CellString(State cell)
 		case State::kObstacle:	return "⛰️   ";
 		case State::kPath: return "🚗   ";
 		case State::kClosed: return "C   ";
+		case State::kStart: return "🚦   ";
+		case State::kFinish: return "🏁   ";
 		case State::kEmpty: return "0   ";
 		default: return "?   ";
 	}
